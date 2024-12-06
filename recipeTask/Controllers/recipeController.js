@@ -1,55 +1,79 @@
-const Recipe = require('../Model/recipeModel');
+import recipes from "../Model/recipesSchema.js";
 
-// Create a new recipe
-exports.createRecipe = async (req, res) => {
+//POST
+export const createRecipes = async (req, res) => { 
     try {
-        const recipe = new Recipe(req.body);
-        await recipe.save();
-        res.status(201).json({ message: "Recipe created successfully", data: recipe });
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+      const newRecipe = new recipes(req.body);
+      await newRecipe.save();
+      res
+        .status(200)
+        .json({ message: "Recipes added Successfully", data: newRecipe });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
 };
 
-// Get all recipes
-exports.getAllRecipes = async (req, res) => {
-    try {
-        const recipes = await Recipe.find();
-        res.status(200).json(recipes);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+//GET Method
+export const getAllRecipes = async (req, res) => {
+  try {
+    const getRecipes = await recipes.find();
+    res
+      .status(200)
+      .json({ message: "Here are your delicious recipes!", data: getRecipes });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Get a recipe by ID
-exports.getRecipeById = async (req, res) => {
-    try {
-        const recipe = await Recipe.findById(req.params.id);
-        if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-        res.status(200).json(recipe);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+//GET BY ID Method
+export const getRecipesById = async (req, res) => {
+  try {
+    const recipesId = req.params.id;
+    const recipe = await recipes.findById(recipesId);
+    if (!recipe) {
+      return res.ststus(404).json({ message: "Recipes Not Found" });
     }
+    res
+      .status(200)
+      .json({ meassage: "Your Recipes Retrived Successfully", data: recipe });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Update a recipe by ID
-exports.updateRecipe = async (req, res) => {
-    try {
-        const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-        res.status(200).json({ message: "Recipe updated successfully", data: recipe });
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+//PUT Method
+export const updateRecipes = async (req, res) => {
+  try {
+    const recipesId = req.params.id;
+    const { name, procedure, ingredients, duration } = req.body;
+    const result = await recipes.findByIdAndUpdate(
+      { _id: recipesId },
+      { name, procedure, ingredients, duration },
+      { new: true }
+    );
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Recipes Not Found" });
     }
+    // const product =await recipes.findById(recipesId);
+    res.status(200).json({ message: "Recipes Updated", data: result });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Delete a recipe by ID
-exports.deleteRecipe = async (req, res) => {
-    try {
-        const recipe = await Recipe.findByIdAndDelete(req.params.id);
-        if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-        res.status(200).json({ message: "Recipe deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+//Delete Method
+export const deleteRecipes = async (req, res) => {
+  try {
+    const recipesId = req.params.id;
+    const result = await recipes.findByIdAndDelete({ _id: recipesId });
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Recipes Not Found" });
     }
+    const recipe = await recipes.find();
+    res
+      .status(200)
+      .json({ message: "Recipe was Deleted Successfully", data: recipe });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
