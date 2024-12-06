@@ -1,13 +1,18 @@
-require('dotenv').config();
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect("mongodb://localhost:27017/guviTaskManager");
-    console.log("Database connected");
-  } catch (error) {
-    console.log("Database connection failed");
-  }
-};
+dotenv.config();
 
-module.exports = connectDB;
+
+const connectDB = async()=>{
+    try {
+        await mongoose.connect(process.env.MONGODB_URL)
+        console.log("MongoDB was Created Successfully");
+        
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+export default connectDB;
